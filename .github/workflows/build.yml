@@ -5,6 +5,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  VCPKG_ROOT: C:\vcpkg
+
 jobs:
   build:
     runs-on: windows-latest
@@ -15,16 +18,36 @@ jobs:
         shell: bash
         run: |
           BASELINE=$(git ls-remote https://gitlab.com/colorglass/vcpkg-colorglass HEAD | cut -f1)
-          echo "Using baseline $BASELINE"
+          echo "Using baseline '$BASELINE'"
+          test -n "$BASELINE"
           sed -i "s/__BASELINE__/$BASELINE/" vcpkg-configuration.json
+          cat vcpkg-configuration.json
 
       - name: Configure
         shell: pwsh
-        run: cmake --preset release
+        run: |
+          Write-Host "VCPKG_ROOT=$env:VCPKG_ROOT exists=$(Test-Path $env:VCPKG_ROOT)"
+          cmake --preset release 2>&1 | Tee-Object -FilePath cfg.log
+          if ($LASTEXITCODE -ne 0) {
+            $tail = (Get-Content cfg.log -Tail 50) -join "%0A"
+            Write-Host "::error title=Configure failed::$tail"
+            $extra = Get-ChildItem -Path build, $env:VCPKG_ROOT\buildtrees -Recurse -Include *.log -ErrorAction SilentlyContinue | Select-Object -First 3
+            foreach ($f in $extra) {
+              $t = (Get-Content $f.FullName -Tail 30) -join "%0A"
+              Write-Host "::error title=$($f.Name)::$t"
+            }
+            exit 1
+          }
 
       - name: Build
         shell: pwsh
-        run: cmake --build --preset release
+        run: |
+          cmake --build --preset release 2>&1 | Tee-Object -FilePath build.log
+          if ($LASTEXITCODE -ne 0) {
+            $errs = Select-String -Path build.log -Pattern "error" | Select-Object -First 25 | ForEach-Object { $_.Line }
+            Write-Host "::error title=Build failed::$($errs -join '%0A')"
+            exit 1
+          }
 
       - name: Package for Vortex
         shell: pwsh
