@@ -1,0 +1,56 @@
+{
+  "modName": "AimAssist",
+  "displayName": "Aim Assist",
+  "minMcmVersion": 7,
+  "content": [
+    {
+      "text": "General",
+      "type": "header"
+    },
+    {
+      "id": "bEnabled:General",
+      "text": "Enable aim assist",
+      "type": "toggle",
+      "help": "Master switch. Controller only; mouse and keyboard are never affected.",
+      "valueOptions": { "sourceType": "ModSettingBool" }
+    },
+    {
+      "id": "bBowsAndSpellsOnly:General",
+      "text": "Bows and spells only",
+      "type": "toggle",
+      "help": "Off also assists melee weapons.",
+      "valueOptions": { "sourceType": "ModSettingBool" }
+    },
+    {
+      "id": "bHostileOnly:General",
+      "text": "Hostile targets only",
+      "type": "toggle",
+      "valueOptions": { "sourceType": "ModSettingBool" }
+    },
+    {
+      "text": "Strength",
+      "type": "header"
+    },
+    {
+      "id": "fStrength:Friction",
+      "text": "Friction strength",
+      "type": "slider",
+      "help": "How much the camera slows down near a target. 0 = off.",
+      "valueOptions": { "min": 0.0, "max": 1.0, "step": 0.05, "formatString": "{2}", "sourceType": "ModSettingFloat" }
+    },
+    {
+      "id": "fStrength:Magnetism",
+      "text": "Magnetism strength",
+      "type": "slider",
+      "help": "How hard the crosshair is pulled toward the target while you move the stick. 0 = off.",
+      "valueOptions": { "min": 0.0, "max": 12.0, "step": 0.5, "formatString": "{1}", "sourceType": "ModSettingFloat" }
+    },
+    {
+      "id": "fConeDegrees:Targeting",
+      "text": "Assist cone (degrees)",
+      "type": "slider",
+      "help": "How close to the crosshair a target must be for assist to kick in.",
+      "valueOptions": { "min": 2.0, "max": 30.0, "step": 1.0, "formatString": "{0}", "sourceType": "ModSettingFloat" }
+    }
+  ]
+}

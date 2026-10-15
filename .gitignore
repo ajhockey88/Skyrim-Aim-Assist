@@ -1,0 +1,5 @@
+build/
+.vcpkg/
+vcpkg_installed/
+*.zip
+vcpkg-configuration.json.template
