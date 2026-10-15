@@ -20,13 +20,26 @@ jobs:
           BASELINE=$(git ls-remote https://gitlab.com/colorglass/vcpkg-colorglass HEAD | cut -f1)
           echo "Using baseline '$BASELINE'"
           test -n "$BASELINE"
-          sed -i "s/__BASELINE__/$BASELINE/" vcpkg-configuration.json
+          VCPKG_BASELINE=$(git ls-remote https://github.com/microsoft/vcpkg HEAD | cut -f1)
+          echo "Using vcpkg baseline '$VCPKG_BASELINE'"
+          test -n "$VCPKG_BASELINE"
+          sed -i "s/__BASELINE__/$BASELINE/; s/__VCPKG_BASELINE__/$VCPKG_BASELINE/" vcpkg-configuration.json
           cat vcpkg-configuration.json
+
+      - name: Install Ninja
+        shell: pwsh
+        run: choco install ninja -y --no-progress
 
       - name: Load MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
+
+      - name: Use the git-based vcpkg on the runner
+        shell: pwsh
+        run: |
+          # msvc-dev-cmd points VCPKG_ROOT at the copy bundled with Visual Studio, which is not a git checkout.
+          "VCPKG_ROOT=C:\vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Configure
         shell: pwsh

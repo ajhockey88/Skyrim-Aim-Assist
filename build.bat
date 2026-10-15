@@ -24,8 +24,12 @@ if exist vcpkg-configuration.json.template (
 for /f %%h in ('git ls-remote https://gitlab.com/colorglass/vcpkg-colorglass HEAD') do (
   if not defined BASELINE set "BASELINE=%%h"
 )
+for /f %%h in ('git ls-remote https://github.com/microsoft/vcpkg HEAD') do (
+  if not defined VCPKG_BASELINE set "VCPKG_BASELINE=%%h"
+)
 echo Registry baseline: %BASELINE%
-powershell -NoProfile -Command "(Get-Content vcpkg-configuration.json) -replace '__BASELINE__','%BASELINE%' | Set-Content vcpkg-configuration.json"
+echo vcpkg baseline: %VCPKG_BASELINE%
+powershell -NoProfile -Command "(Get-Content vcpkg-configuration.json) -replace '__VCPKG_BASELINE__','%VCPKG_BASELINE%' -replace '__BASELINE__','%BASELINE%' | Set-Content vcpkg-configuration.json"
 
 cmake --preset release || exit /b 1
 cmake --build --preset release || exit /b 1
