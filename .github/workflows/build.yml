@@ -62,8 +62,17 @@ jobs:
         run: |
           cmake --build --preset release 2>&1 | Tee-Object -FilePath build.log
           if ($LASTEXITCODE -ne 0) {
-            $errs = Select-String -Path build.log -Pattern "error" | Select-Object -First 25 | ForEach-Object { $_.Line }
-            Write-Host "::error title=Build failed::$($errs -join '%0A')"
+            $lines = Get-Content build.log
+            $i = ($lines | Select-String -Pattern "^FAILED:" | Select-Object -First 1).LineNumber
+            $ctx = $lines[($i-1)..([Math]::Min($i+14, $lines.Count-1))] | ForEach-Object { if ($_.Length -gt 220) { $_.Substring(0,220) } else { $_ } }
+            Write-Host "::error title=First failure::$($ctx -join '%0A')"
+            $inc = "build\vcpkg_installed\x64-windows-static-md\include"
+            $pch = (Get-Content "$inc\SKSE\Impl\PCH.h" -TotalCount 80) -join "%0A"
+            Write-Host "::error title=PCH.h head::$pch"
+            $rel = (Get-Content "$inc\REL\Relocation.h" | Select-Object -Skip 1 -First 40) -join "%0A"
+            Write-Host "::error title=Relocation.h head::$rel"
+            $sky = (Get-Content "$inc\RE\Skyrim.h" -TotalCount 12) -join "%0A"
+            Write-Host "::error title=Skyrim.h head::$sky"
             exit 1
           }
 
