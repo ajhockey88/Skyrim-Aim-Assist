@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      release:
+        description: "Version tag to release, e.g. v1.0.0 (leave empty to only build)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -93,8 +98,10 @@ jobs:
           path: AimAssist-1.0.0.zip
 
       - name: Publish release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.release != '')
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ inputs.release || github.ref_name }}
+          target_commitish: ${{ github.sha }}
           files: AimAssist-1.0.0.zip
-          body_path: .github/release-notes/${{ github.ref_name }}.md
+          body_path: .github/release-notes/${{ inputs.release || github.ref_name }}.md
