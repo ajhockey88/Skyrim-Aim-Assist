@@ -15,3 +15,4 @@ add_commonlibsse_plugin(${PROJECT_NAME}
     SOURCES src/main.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog)
+target_precompile_headers(${PROJECT_NAME} PRIVATE src/PCH.h)
