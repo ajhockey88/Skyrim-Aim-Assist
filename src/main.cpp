@@ -228,9 +228,8 @@ namespace
 			}
 
 			if (g.requireLineOfSight) {
-				bool los = false;
-				player->HasLineOfSight(actor, los);
-				if (!los) {
+				bool unused = false;
+				if (!player->HasLineOfSight(actor, unused)) {
 					continue;
 				}
 			}
