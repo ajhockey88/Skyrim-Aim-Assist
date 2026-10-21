@@ -15,21 +15,17 @@ if not defined VCPKG_ROOT (
   )
 )
 
-REM Pin the Color-Glass registry baseline to its latest commit
+REM Pin the vcpkg registry baseline to its latest commit
 if exist vcpkg-configuration.json.template (
   copy /y vcpkg-configuration.json.template vcpkg-configuration.json >nul
 ) else (
   copy /y vcpkg-configuration.json vcpkg-configuration.json.template >nul
 )
-for /f %%h in ('git ls-remote https://gitlab.com/colorglass/vcpkg-colorglass HEAD') do (
-  if not defined BASELINE set "BASELINE=%%h"
-)
 for /f %%h in ('git ls-remote https://github.com/microsoft/vcpkg HEAD') do (
   if not defined VCPKG_BASELINE set "VCPKG_BASELINE=%%h"
 )
-echo Registry baseline: %BASELINE%
 echo vcpkg baseline: %VCPKG_BASELINE%
-powershell -NoProfile -Command "(Get-Content vcpkg-configuration.json) -replace '__VCPKG_BASELINE__','%VCPKG_BASELINE%' -replace '__BASELINE__','%BASELINE%' | Set-Content vcpkg-configuration.json"
+powershell -NoProfile -Command "(Get-Content vcpkg-configuration.json) -replace '__VCPKG_BASELINE__','%VCPKG_BASELINE%' | Set-Content vcpkg-configuration.json"
 
 cmake --preset release || exit /b 1
 cmake --build --preset release || exit /b 1
@@ -42,6 +38,6 @@ if not exist package\SKSE\Plugins\AimAssist.dll (
   exit /b 1
 )
 
-powershell -NoProfile -Command "Compress-Archive -Force -Path package\* -DestinationPath AimAssist-1.0.0.zip"
+powershell -NoProfile -Command "Compress-Archive -Force -Path package\* -DestinationPath AimAssist-1.0.1.zip"
 echo.
-echo Done: %~dp0AimAssist-1.0.0.zip  (drag this into Vortex)
+echo Done: %~dp0AimAssist-1.0.1.zip  (drag this into Vortex)

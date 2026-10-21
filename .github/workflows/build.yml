@@ -22,16 +22,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Pin Color-Glass vcpkg registry baseline
+      - name: Pin vcpkg registry baseline
         shell: bash
         run: |
-          BASELINE=$(git ls-remote https://gitlab.com/colorglass/vcpkg-colorglass HEAD | cut -f1)
-          echo "Using baseline '$BASELINE'"
-          test -n "$BASELINE"
           VCPKG_BASELINE=$(git ls-remote https://github.com/microsoft/vcpkg HEAD | cut -f1)
           echo "Using vcpkg baseline '$VCPKG_BASELINE'"
           test -n "$VCPKG_BASELINE"
-          sed -i "s/__BASELINE__/$BASELINE/; s/__VCPKG_BASELINE__/$VCPKG_BASELINE/" vcpkg-configuration.json
+          sed -i "s/__VCPKG_BASELINE__/$VCPKG_BASELINE/" vcpkg-configuration.json
           cat vcpkg-configuration.json
 
       - name: Install Ninja
@@ -72,15 +69,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) {
             $lines = Get-Content build.log
             $i = ($lines | Select-String -Pattern "^FAILED:" | Select-Object -First 1).LineNumber
-            $ctx = $lines[($i-1)..([Math]::Min($i+14, $lines.Count-1))] | ForEach-Object { if ($_.Length -gt 220) { $_.Substring(0,220) } else { $_ } }
+            $ctx = $lines[($i-1)..([Math]::Min($i+40, $lines.Count-1))] | ForEach-Object { if ($_.Length -gt 220) { $_.Substring(0,220) } else { $_ } }
             Write-Host "::error title=First failure::$($ctx -join '%0A')"
-            $inc = "build\vcpkg_installed\x64-windows-static-md\include"
-            $pch = (Get-Content "$inc\SKSE\Impl\PCH.h" -TotalCount 80) -join "%0A"
-            Write-Host "::error title=PCH.h head::$pch"
-            $rel = (Get-Content "$inc\REL\Relocation.h" | Select-Object -Skip 1 -First 40) -join "%0A"
-            Write-Host "::error title=Relocation.h head::$rel"
-            $sky = (Get-Content "$inc\RE\Skyrim.h" -TotalCount 12) -join "%0A"
-            Write-Host "::error title=Skyrim.h head::$sky"
             exit 1
           }
 
@@ -90,12 +80,12 @@ jobs:
           $dll = Get-ChildItem -Path build -Recurse -Filter AimAssist.dll | Select-Object -First 1
           if (-not $dll) { throw "AimAssist.dll not found" }
           Copy-Item $dll.FullName package/SKSE/Plugins/AimAssist.dll
-          Compress-Archive -Path package/* -DestinationPath AimAssist-1.0.0.zip
+          Compress-Archive -Path package/* -DestinationPath AimAssist-1.0.1.zip
 
       - uses: actions/upload-artifact@v4
         with:
           name: AimAssist-Vortex
-          path: AimAssist-1.0.0.zip
+          path: AimAssist-1.0.1.zip
 
       - name: Publish release
         if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.release != '')
@@ -103,5 +93,5 @@ jobs:
         with:
           tag_name: ${{ inputs.release || github.ref_name }}
           target_commitish: ${{ github.sha }}
-          files: AimAssist-1.0.0.zip
+          files: AimAssist-1.0.1.zip
           body_path: .github/release-notes/${{ inputs.release || github.ref_name }}.md
