@@ -245,13 +245,13 @@ namespace
 
 	struct LookHook
 	{
-		static void Thunk(RE::PlayerInputHandler* a_this, RE::ThumbstickEvent* a_event)
+		static void Thunk(RE::PlayerInputHandler* a_this, RE::ThumbstickEvent* a_event, RE::PlayerControlsData* a_data)
 		{
 			MaybeReload();
 			if (g.enabled && a_event && a_event->IsRight()) {
 				Adjust(a_event);
 			}
-			func(a_this, a_event);
+			func(a_this, a_event, a_data);
 		}
 
 		static void Adjust(RE::ThumbstickEvent* ev)
@@ -317,10 +317,12 @@ SKSEPluginLoad(const SKSE::LoadInterface* skse)
 	logger::info("AimAssist loading");
 	LoadSettings();
 
-	// vfunc 0 dtor, 1 CanProcess, 2 ProcessThumbstick, 3 ProcessMouseMove, 4 ProcessButton
+	// vfunc 0 dtor, 1 CanProcess, 2 ProcessThumbstick, 3 ProcessMouseMove, 4 ProcessButton.
+	// 1.7.99+ inserts ProcessMotionGesture and ProcessSixaxis at 2 and 3, shifting the rest by two.
+	const auto slot = REL::VersionShift(0x2, RE::PlayerInputHandler::kAE1799AddedVFuncCount, SKSE::RUNTIME_SSE_1_7_99);
 	REL::Relocation<std::uintptr_t> vtbl{ RE::VTABLE_LookHandler[0] };
-	LookHook::func = vtbl.write_vfunc(0x2, LookHook::Thunk);
+	LookHook::func = vtbl.write_vfunc(slot, LookHook::Thunk);
 
-	logger::info("Look handler hooked");
+	logger::info("Look handler hooked (game {}, vfunc slot {})", REL::Module::get().version().string("."), slot);
 	return true;
 }

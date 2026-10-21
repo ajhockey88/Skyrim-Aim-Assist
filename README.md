@@ -7,22 +7,22 @@ Controller aim assist for Skyrim, inspired by Oblivion Remastered. An SKSE plugi
 - Defaults: bows, crossbows and spells only, hostile targets only, weapon drawn, line of sight required.
 
 ## Requirements
-- Skyrim Special Edition, current 1.6.x version
+- Skyrim Special Edition or Anniversary Edition: 1.5.97, 1.6.x or 1.7.x
 - [SKSE64](https://skse.silverlock.org/)
-- [Address Library for SKSE Plugins](https://www.nexusmods.com/skyrimspecialedition/mods/32444) (the all-in-one 1.6 version)
+- [Address Library for SKSE Plugins](https://www.nexusmods.com/skyrimspecialedition/mods/32444) (the all-in-one file matching your game version)
 
 ## In-game settings (MCM)
 Journal → System → Mod Configuration → Aim Assist. Needs [SkyUI](https://www.nexusmods.com/skyrimspecialedition/mods/12604) and [MCM Helper](https://www.nexusmods.com/skyrimspecialedition/mods/53000). Changes apply within about a second, no restart. Anything not in the menu (aim height, max distance, invert yaw/pitch) is still in `AimAssist.ini`; MCM values override the INI.
 
 ## Build without GitHub
-Install Visual Studio 2022 (Desktop development with C++), CMake and Git, then double-click `build.bat` from an x64 Native Tools prompt. It sets up vcpkg, builds, and writes `AimAssist-1.0.0.zip` ready for Vortex.
+Install Visual Studio 2022 (Desktop development with C++), CMake and Git, then double-click `build.bat` from an x64 Native Tools prompt. It sets up vcpkg, builds, and writes `AimAssist-1.0.1.zip` ready for Vortex.
 
 ## Build with GitHub
-Push this folder to a GitHub repo. The **Build** workflow compiles on a Windows runner and uploads `AimAssist-Vortex` as an artifact (`AimAssist-1.0.0.zip`). To build locally you need Visual Studio 2022, CMake and vcpkg (`VCPKG_ROOT` set); replace `__BASELINE__` in `vcpkg-configuration.json` with a commit hash of https://gitlab.com/colorglass/vcpkg-colorglass, then run `cmake --preset release` and `cmake --build --preset release`.
+Push this folder to a GitHub repo. The **Build** workflow compiles on a Windows runner and uploads `AimAssist-Vortex` as an artifact (`AimAssist-1.0.1.zip`). To build locally you need Visual Studio 2022, CMake and vcpkg (`VCPKG_ROOT` set); replace `__VCPKG_BASELINE__` in `vcpkg-configuration.json` with a commit hash of https://github.com/microsoft/vcpkg, then run `cmake --preset release` and `cmake --build --preset release`.
 
 ## Install with Vortex
 1. Download the artifact and unzip it once (GitHub wraps artifacts in a zip).
-2. In Vortex, drag `AimAssist-1.0.0.zip` onto the mods page, then install and enable it.
+2. In Vortex, drag `AimAssist-1.0.1.zip` onto the mods page, then install and enable it.
 3. Launch through `skse64_loader.exe`.
 
 ## Tuning
